@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
 const patientSchema = new Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
