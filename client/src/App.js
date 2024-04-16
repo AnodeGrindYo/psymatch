@@ -1,26 +1,21 @@
-// import logo from './logo.svg';
+// Desc: Main entry point for the react app
 import './App.css';
-import Component from './components/loginscreen';
+// import Component from './components/loginscreen';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './components/loginscreen';
+import Register from './components/registerscreen';
 
 function App() {
   return (
-    <Component />
-    // <div className="App">
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <p>
-    //       Edit <code>src/App.js</code> and save to reload.
-    //     </p>
-    //     <a
-    //       className="App-link"
-    //       href="https://reactjs.org"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //     >
-    //       Learn React
-    //     </a>
-    //   </header>
-    // </div>
+    // <Component/>
+    <Router>
+      <Routes>
+        <Route exact path="/" element={<Login/>} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/register" element={<Register/>} />
+
+      </Routes>
+    </Router>
   );
 }
 
