@@ -13,43 +13,6 @@ generateToken = (user) => {
 };
 
 // Register function for both psychologists and patients
-// register = async (req, res) => {
-//     console.log("register function");
-//     const { email, password, role } = req.body;
-
-//     console.log(req.body);
-
-//     try {
-//         // Check if user already exists
-//         let userExists = (role === 'psychologist')
-//             ? await Psychologist.findOne({ email })
-//             : await Patient.findOne({ email });
-
-//         if (userExists) {
-//             return res.status(409).json({ message: "Email already in use." });
-//         }
-
-//         // Hash the password
-//         const hashedPassword = await bcrypt.hash(password, 10);
-
-//         // Create user according to the role
-//         let newUser;
-//         if (role === 'psychologist') {
-//             newUser = await Psychologist.create({ ...req.body, password: hashedPassword });
-//         } else if (role === 'patient') {
-//             newUser = await Patient.create({ ...req.body, password: hashedPassword });
-//         } else {
-//             return res.status(400).json({ message: "Invalid user role specified." });
-//         }
-
-//         // Generate JWT Token
-//         const token = generateToken(newUser);
-
-//         res.status(201).json({ message: "User created successfully", token });
-//     } catch (error) {
-//         res.status(500).json({ message: "Error registering user", error: error.message });
-//     }
-// };
 register = async (req, res) => {
     console.log("register function started");
     const { email, password, role } = req.body;
@@ -116,30 +79,49 @@ register = async (req, res) => {
 login = async (req, res) => {
     const { email, password, role } = req.body;
 
+    console.log("Starting login process...");
+    console.log("Received login details:", req.body);
+
     try {
+        console.log(`Looking up user: ${email} with role: ${role}`);
         // Find user by email and role
         let user = (role === 'psychologist')
             ? await Psychologist.findOne({ email })
             : await Patient.findOne({ email });
 
         if (!user) {
+            console.log("User not found for email:", email);
             return res.status(401).json({ message: "User not found" });
         }
 
+        console.log("User found, comparing password...");
         // Compare password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: "Invalid password... Go hoem, you're drunk !" });
+            console.log("Password comparison failed");
+            return res.status(401).json({ message: "Invalid password... Go home, you're drunk !" });
         }
 
+        console.log("Password match successful, generating token...");
         // Generate JWT Token
         const token = generateToken(user);
 
-        res.status(200).json({ message: "User logged in successfully", token });
+        // supprime le mot de passe du résultat
+        user = user.toObject();
+        delete user.password;
+
+        console.log("Token generated successfully, logging in user...");
+        res.status(200).json({ 
+            message: "User logged in successfully", 
+            token, 
+            user: user
+        });
     } catch (error) {
+        console.log("Error during login process:", error);
         res.status(500).json({ message: "Error logging in", error: error.message });
     }
 };
+
 
 module.exports = {
     register,
