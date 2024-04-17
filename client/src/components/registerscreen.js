@@ -15,6 +15,8 @@ function Register() {
     bio: '', // Pour les psychologues
   });
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -25,9 +27,32 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logique d'envoi des données à l'API (à compléter)
+    setErrorMessage(''); // reset le message d'erreur
+    // Logique d'envoi des données à l'API
     console.log(formData);
-    // appeler l'API ici avec les données du formulaire.
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Something went wrong with the registration.');
+      }
+  
+      const result = await response.json();
+      console.log('Registration successful:', result);
+  
+      // TODO : Rediriger l'utilisateur (vers une page de confirmation ?)
+    } catch (error) {
+      console.error('Registration failed:', error.message);
+      // TODO : Afficher un message d'erreur à l'utilisateur
+      setErrorMessage(error.message); // Définir le message d'erreur pour l'utilisateur
+    }
   };
 
   return (
@@ -42,7 +67,7 @@ function Register() {
               name="role"
               onChange={handleChange}
               value={formData.role}
-              className="w-full p-2 border rounded"
+              className="w-full p-4 border rounded"
             >
               <option value="patient">Patient</option>
               <option value="psychologist">Psychologist</option>
@@ -58,7 +83,7 @@ function Register() {
               onChange={handleChange}
               value={formData.firstName}
               required
-              className="w-full p-2 border rounded"
+              className="w-full p-4 border rounded"
             />
           </div>
           <div className="mb-4">
@@ -69,7 +94,7 @@ function Register() {
               onChange={handleChange}
               value={formData.lastName}
               required
-              className="w-full p-2 border rounded"
+              className="w-full p-4 border rounded"
             />
           </div>
           <div className="mb-4">
@@ -80,7 +105,7 @@ function Register() {
               onChange={handleChange}
               value={formData.email}
               required
-              className="w-full p-2 border rounded"
+              className="w-full p-4 border rounded"
             />
           </div>
           <div className="mb-4">
@@ -91,7 +116,7 @@ function Register() {
               onChange={handleChange}
               value={formData.password}
               required
-              className="w-full p-2 border rounded"
+              className="w-full p-4 border rounded"
             />
           </div>
 
@@ -106,7 +131,7 @@ function Register() {
                   onChange={handleChange}
                   value={formData.preferredLanguage}
                   required
-                  className="w-full p-2 border rounded"
+                  className="w-full p-4 border rounded"
                 />
               </div>
               <div className="mb-4">
@@ -115,7 +140,7 @@ function Register() {
                   name="locationPreference"
                   onChange={handleChange}
                   value={formData.locationPreference}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-4 border rounded"
                 >
                   <option value="Remote">Remote</option>
                   <option value="In-person">In-person</option>
@@ -133,11 +158,17 @@ function Register() {
                   placeholder="Bio"
                   onChange={handleChange}
                   value={formData.bio}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-4 border rounded"
                 />
               </div>
             </>
           )}
+
+        {errorMessage && (
+                  <div className="mb-4 text-red-500">
+                    {errorMessage}
+                  </div>
+                )}
 
           {/* Register Button */}
           <div className="flex justify-end">

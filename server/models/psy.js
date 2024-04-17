@@ -21,3 +21,5 @@ const psychologistSchema = new Schema({
 });
 
 const Psychologist = mongoose.model('Psychologist', psychologistSchema);
+
+module.exports = Psychologist;

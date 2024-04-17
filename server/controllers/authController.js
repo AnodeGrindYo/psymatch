@@ -13,40 +13,104 @@ generateToken = (user) => {
 };
 
 // Register function for both psychologists and patients
+// register = async (req, res) => {
+//     console.log("register function");
+//     const { email, password, role } = req.body;
+
+//     console.log(req.body);
+
+//     try {
+//         // Check if user already exists
+//         let userExists = (role === 'psychologist')
+//             ? await Psychologist.findOne({ email })
+//             : await Patient.findOne({ email });
+
+//         if (userExists) {
+//             return res.status(409).json({ message: "Email already in use." });
+//         }
+
+//         // Hash the password
+//         const hashedPassword = await bcrypt.hash(password, 10);
+
+//         // Create user according to the role
+//         let newUser;
+//         if (role === 'psychologist') {
+//             newUser = await Psychologist.create({ ...req.body, password: hashedPassword });
+//         } else if (role === 'patient') {
+//             newUser = await Patient.create({ ...req.body, password: hashedPassword });
+//         } else {
+//             return res.status(400).json({ message: "Invalid user role specified." });
+//         }
+
+//         // Generate JWT Token
+//         const token = generateToken(newUser);
+
+//         res.status(201).json({ message: "User created successfully", token });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error registering user", error: error.message });
+//     }
+// };
 register = async (req, res) => {
+    console.log("register function started");
     const { email, password, role } = req.body;
+
+    console.log("Received body:", req.body);
 
     try {
         // Check if user already exists
+        console.log("Checking if user already exists...");
         let userExists = (role === 'psychologist')
             ? await Psychologist.findOne({ email })
             : await Patient.findOne({ email });
 
         if (userExists) {
+            console.log("Email already in use:", email);
             return res.status(409).json({ message: "Email already in use." });
         }
 
         // Hash the password
+        console.log("Hashing password...");
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create user according to the role
         let newUser;
         if (role === 'psychologist') {
-            newUser = await Psychologist.create({ ...req.body, password: hashedPassword });
+            console.log("Creating psychologist...");
+            newUser = await Psychologist.create({
+                ...req.body,
+                password: hashedPassword,
+                // Ensure required fields are populated
+                languages: req.body.languages || [],
+                specialization: req.body.specialization || [],
+                geoLocation: req.body.geoLocation || { lat: null, long: null }
+            });
         } else if (role === 'patient') {
-            newUser = await Patient.create({ ...req.body, password: hashedPassword });
+            console.log("Creating patient...");
+            newUser = await Patient.create({
+                ...req.body,
+                password: hashedPassword,
+                // Ensure required fields are populated
+                preferredLanguage: req.body.preferredLanguage || "undefined",
+                issues: req.body.issues || [],
+                locationPreference: req.body.locationPreference || 'No Preference'
+            });
         } else {
+            console.log("Invalid user role specified:", role);
             return res.status(400).json({ message: "Invalid user role specified." });
         }
 
         // Generate JWT Token
+        console.log("Generating token...");
         const token = generateToken(newUser);
 
+        console.log("User created successfully:", newUser);
         res.status(201).json({ message: "User created successfully", token });
     } catch (error) {
+        console.log("Error registering user:", error);
         res.status(500).json({ message: "Error registering user", error: error.message });
     }
 };
+
 
 // Login function for both psychologists and patients
 login = async (req, res) => {
