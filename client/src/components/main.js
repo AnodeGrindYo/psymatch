@@ -4,10 +4,13 @@ import Navbar from './navbar';
 function Main() {
     return (
         <div>
-            <h1>PsyMatch</h1>
-            <p>Welcome to PsyMatch! This is the main page, bitch.</p>
+            <Navbar />
+            <div className="container mx-auto p-4">
+                <h1 className="text-2xl font-bold">PsyMatch</h1>
+                <p className="mt-2">Welcome to PsyMatch! This is the main page</p>
+            </div>
         </div>
-    )
+    );
 }
 
 export default Main;
