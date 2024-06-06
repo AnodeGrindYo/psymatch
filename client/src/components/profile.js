@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from './UserContext';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
     const { user, setUser } = useContext(UserContext);
@@ -24,6 +25,8 @@ const Profile = () => {
                 return;
             }
 
+            console.log('Fetching data for user:', user);
+
             try {
                 const response = await fetch(`/api/auth/getCurrentUser/${user._id}`, {
                     method: 'GET',
@@ -38,6 +41,7 @@ const Profile = () => {
                 }
 
                 const userData = await response.json();
+                console.log('User data fetched:', userData);
                 setFormData(userData);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -89,7 +93,10 @@ const Profile = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-blue-500">
-            <div className="p-8 bg-white rounded-lg shadow-lg">
+            <div className="relative p-8 bg-white rounded-lg shadow-lg">
+                <Link to="/main" className="absolute top-0 right-0 mt-2 mr-2 text-gray-500 hover:text-gray-700">
+                    &times;
+                </Link>
                 <h2 className="text-xl font-semibold text-blue-500 mb-6">Profile</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
