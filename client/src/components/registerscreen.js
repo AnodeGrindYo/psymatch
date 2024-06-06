@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ function Register() {
   });
 
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,7 +49,8 @@ function Register() {
       const result = await response.json();
       console.log('Registration successful:', result);
   
-      // TODO : Rediriger l'utilisateur (vers une page de confirmation ?)
+      // Rediriger l'utilisateur vers la page de login
+      navigate('/login');
     } catch (error) {
       console.error('Registration failed:', error.message);
       // TODO : Afficher un message d'erreur à l'utilisateur
