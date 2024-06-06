@@ -76,18 +76,68 @@ register = async (req, res) => {
 
 
 // Login function for both psychologists and patients
+// login = async (req, res) => {
+//     const { email, password, role } = req.body;
+
+//     console.log("Starting login process...");
+//     console.log("Received login details:", req.body);
+
+//     try {
+//         console.log(`Looking up user: ${email} with role: ${role}`);
+//         // Find user by email and role
+//         let user = (role === 'psychologist')
+//             ? await Psychologist.findOne({ email })
+//             : await Patient.findOne({ email });
+
+//         if (!user) {
+//             console.log("User not found for email:", email);
+//             return res.status(401).json({ message: "User not found" });
+//         }
+
+//         console.log("User found, comparing password...");
+//         // Compare password
+//         const isMatch = await bcrypt.compare(password, user.password);
+//         if (!isMatch) {
+//             console.log("Password comparison failed");
+//             return res.status(401).json({ message: "Invalid password... Go home, you're drunk !" });
+//         }
+
+//         console.log("Password match successful, generating token...");
+//         // Generate JWT Token
+//         const token = generateToken(user);
+
+//         // supprime le mot de passe du résultat
+//         user = user.toObject();
+//         delete user.password;
+
+//         console.log("Token generated successfully, logging in user...");
+//         res.status(200).json({ 
+//             message: "User logged in successfully", 
+//             token, 
+//             user: user
+//         });
+//     } catch (error) {
+//         console.log("Error during login process:", error);
+//         res.status(500).json({ message: "Error logging in", error: error.message });
+//     }
+// };
 login = async (req, res) => {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     console.log("Starting login process...");
     console.log("Received login details:", req.body);
 
     try {
-        console.log(`Looking up user: ${email} with role: ${role}`);
-        // Find user by email and role
-        let user = (role === 'psychologist')
-            ? await Psychologist.findOne({ email })
-            : await Patient.findOne({ email });
+        console.log(`Looking up user: ${email}`);
+
+        // Find user by email in both collections
+        const [psychologist, patient] = await Promise.all([
+            Psychologist.findOne({ email }),
+            Patient.findOne({ email })
+        ]);
+
+        // Determine if user is found and in which collection
+        let user = psychologist || patient;
 
         if (!user) {
             console.log("User not found for email:", email);

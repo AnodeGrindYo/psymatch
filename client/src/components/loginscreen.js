@@ -46,7 +46,8 @@ function Login() {
             setMessage('Login successful! Redirecting...');
             console.log(result);
 
-            // Rediriger ou manager la session utilisateur
+            // Redirige vers /main
+            window.location.href = '/main';
         } catch (error) {
             setMessage(error.message);
             console.error('Login error:', error);
