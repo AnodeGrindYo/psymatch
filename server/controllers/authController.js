@@ -76,51 +76,6 @@ register = async (req, res) => {
 
 
 // Login function for both psychologists and patients
-// login = async (req, res) => {
-//     const { email, password, role } = req.body;
-
-//     console.log("Starting login process...");
-//     console.log("Received login details:", req.body);
-
-//     try {
-//         console.log(`Looking up user: ${email} with role: ${role}`);
-//         // Find user by email and role
-//         let user = (role === 'psychologist')
-//             ? await Psychologist.findOne({ email })
-//             : await Patient.findOne({ email });
-
-//         if (!user) {
-//             console.log("User not found for email:", email);
-//             return res.status(401).json({ message: "User not found" });
-//         }
-
-//         console.log("User found, comparing password...");
-//         // Compare password
-//         const isMatch = await bcrypt.compare(password, user.password);
-//         if (!isMatch) {
-//             console.log("Password comparison failed");
-//             return res.status(401).json({ message: "Invalid password... Go home, you're drunk !" });
-//         }
-
-//         console.log("Password match successful, generating token...");
-//         // Generate JWT Token
-//         const token = generateToken(user);
-
-//         // supprime le mot de passe du résultat
-//         user = user.toObject();
-//         delete user.password;
-
-//         console.log("Token generated successfully, logging in user...");
-//         res.status(200).json({ 
-//             message: "User logged in successfully", 
-//             token, 
-//             user: user
-//         });
-//     } catch (error) {
-//         console.log("Error during login process:", error);
-//         res.status(500).json({ message: "Error logging in", error: error.message });
-//     }
-// };
 login = async (req, res) => {
     const { email, password } = req.body;
 
@@ -172,8 +127,64 @@ login = async (req, res) => {
     }
 };
 
+// Fonction pour obtenir les informations de l'utilisateur actuel
+getCurrentUser = async (req, res) => {
+    const { userId } = req.params;
+    console.log("Getting user data for:", userId);
+    try {
+        const [psychologist, patient] = await Promise.all([
+            Psychologist.findById(userId),
+            Patient.findById(userId)
+        ]);
+
+        let user = psychologist || patient;
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user = user.toObject();
+        delete user.password; // Supprimer le mot de passe du résultat
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching user data", error: error.message });
+    }
+};
+
+// Fonction pour mettre à jour les informations de l'utilisateur
+updateUser = async (req, res) => {
+    const { userId } = req.params;
+    const updates = req.body;
+
+    try {
+        let user = await Psychologist.findById(userId) || await Patient.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        Object.keys(updates).forEach(key => {
+            if (key !== 'password') {
+                user[key] = updates[key];
+            }
+        });
+
+        await user.save();
+
+        user = user.toObject();
+        delete user.password; // Supprimer le mot de passe du résultat
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating user data", error: error.message });
+    }
+};
 
 module.exports = {
     register,
-    login
+    login,
+    getCurrentUser,
+    updateUser
 };
+

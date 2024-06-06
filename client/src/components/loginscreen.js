@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { UserContext } from './UserContext';
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ function Login() {
     });
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
+    const { setUser } = useContext(UserContext);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -23,7 +25,7 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage(''); // Reset message utilisateur
+        setMessage('');
 
         try {
             const response = await fetch('/api/auth/login', {
@@ -32,7 +34,7 @@ function Login() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: formData.username, // email est l'username
+                    email: formData.username,
                     password: formData.password
                 })
             });
@@ -45,6 +47,10 @@ function Login() {
             const result = await response.json();
             setMessage('Login successful! Redirecting...');
             console.log(result);
+
+            setUser(result.user); // Mettre à jour le contexte avec les infos de l'utilisateur
+            localStorage.setItem('token', result.token); // Stocker le jeton JWT
+            localStorage.setItem('user', JSON.stringify(result.user)); // Stocker les infos utilisateur
 
             // Redirige vers /main
             window.location.href = '/main';
