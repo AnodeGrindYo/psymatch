@@ -14,6 +14,7 @@ const Profile = () => {
         languages: [],
         specialization: [],
         bio: '',
+        profilePicture: ''
     });
 
     const [message, setMessage] = useState('');
@@ -59,18 +60,34 @@ const Profile = () => {
         }));
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setFormData(prevState => ({
+                ...prevState,
+                profilePicture: reader.result
+            }));
+        };
+        reader.readAsDataURL(file);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
 
         try {
+            const formDataToSend = new FormData();
+            Object.keys(formData).forEach(key => {
+                formDataToSend.append(key, formData[key]);
+            });
+
             const response = await fetch(`/api/auth/updateUser/${user._id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify(formData)
+                body: formDataToSend
             });
 
             if (!response.ok) {
@@ -100,6 +117,14 @@ const Profile = () => {
                 <h2 className="text-xl font-semibold text-blue-500 mb-6">Profile</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
+                        {formData.profilePicture ? (
+                            <img src={formData.profilePicture} alt="Profile" className="w-32 h-32 rounded-full mx-auto" />
+                        ) : (
+                            <i className="fas fa-user-circle w-32 h-32 text-gray-300 mx-auto"></i>
+                        )}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-blue-500" htmlFor="firstName">Prénom</label>
                         <input
                             type="text"
                             name="firstName"
@@ -111,6 +136,7 @@ const Profile = () => {
                         />
                     </div>
                     <div className="mb-4">
+                        <label className="block text-blue-500" htmlFor="lastName">Nom</label>
                         <input
                             type="text"
                             name="lastName"
@@ -122,6 +148,7 @@ const Profile = () => {
                         />
                     </div>
                     <div className="mb-4">
+                        <label className="block text-blue-500" htmlFor="email">Email</label>
                         <input
                             type="email"
                             name="email"
@@ -137,6 +164,7 @@ const Profile = () => {
                     {user.role === 'patient' && (
                         <>
                             <div className="mb-4">
+                                <label className="block text-blue-500" htmlFor="preferredLanguage">Langue préférée</label>
                                 <input
                                     type="text"
                                     name="preferredLanguage"
@@ -148,16 +176,16 @@ const Profile = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-blue-500">Location Preference:</label>
+                                <label className="block text-blue-500">Préférence de localisation</label>
                                 <select
                                     name="locationPreference"
                                     onChange={handleInputChange}
                                     value={formData.locationPreference}
                                     className="w-full p-4 border rounded"
                                 >
-                                    <option value="Remote">Remote</option>
-                                    <option value="In-person">In-person</option>
-                                    <option value="No Preference">No Preference</option>
+                                    <option value="Remote">À distance</option>
+                                    <option value="In-person">En personne</option>
+                                    <option value="No Preference">Pas de préférence</option>
                                 </select>
                             </div>
                         </>
@@ -166,6 +194,7 @@ const Profile = () => {
                     {user.role === 'psychologist' && (
                         <>
                             <div className="mb-4">
+                                <label className="block text-blue-500" htmlFor="bio">Biographie</label>
                                 <textarea
                                     name="bio"
                                     placeholder="Bio"
@@ -175,6 +204,7 @@ const Profile = () => {
                                 />
                             </div>
                             <div className="mb-4">
+                                <label className="block text-blue-500" htmlFor="languages">Langues</label>
                                 <input
                                     type="text"
                                     name="languages"
@@ -185,6 +215,7 @@ const Profile = () => {
                                 />
                             </div>
                             <div className="mb-4">
+                                <label className="block text-blue-500" htmlFor="specialization">Spécialisation</label>
                                 <input
                                     type="text"
                                     name="specialization"
@@ -197,6 +228,16 @@ const Profile = () => {
                         </>
                     )}
 
+                    <div className="mb-4">
+                        <label className="block text-blue-500" htmlFor="profilePicture">Photo de profil</label>
+                        <input
+                            type="file"
+                            name="profilePicture"
+                            onChange={handleFileChange}
+                            className="w-full p-4 border rounded"
+                        />
+                    </div>
+
                     {message && (
                         <div className="mb-4 text-green-500">
                             {message}
@@ -205,7 +246,7 @@ const Profile = () => {
 
                     <div className="flex justify-end">
                         <button type="submit" className="bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Save Changes
+                            Sauvegarder
                         </button>
                     </div>
                 </form>

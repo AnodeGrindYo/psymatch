@@ -11,7 +11,8 @@ const patientSchema = new Schema({
     locationPreference: {
         type: String,
         enum: ['Remote', 'In-person', 'No Preference']
-    }
+    },
+    profilePicture: { type: String }
 });
 
 const Patient = mongoose.model('Patient', patientSchema);

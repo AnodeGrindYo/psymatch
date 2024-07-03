@@ -17,7 +17,8 @@ const psychologistSchema = new Schema({
     availableTimes: [{ 
         day: String, 
         timeSlots: [{ start: String, end: String }]
-    }]
+    }],
+    profilePicture: { type: String }
 });
 
 const Psychologist = mongoose.model('Psychologist', psychologistSchema);
