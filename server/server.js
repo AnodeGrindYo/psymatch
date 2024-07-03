@@ -5,6 +5,8 @@ const multer = require('multer');
 const cors = require('cors');
 const app = express();
 const path = require('path');
+const psychologistRoutes = require('./routes/psychologistRoutes');
+const matchRoutes = require('./routes/matchRoutes');
 
 require('dotenv').config();
 
@@ -30,6 +32,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.use('/uploads', express.static('uploads'));
+app.use(psychologistRoutes);
+app.use(matchRoutes);
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
@@ -41,6 +45,6 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });

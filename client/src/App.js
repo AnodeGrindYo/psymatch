@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/loginscreen';
 import Register from './components/registerscreen';
 import Main from './components/main';
-import Profile from './components/profile'; // Importer le composant Profile
+import Profile from './components/profile';
+import SwipeDeck from './components/SwipeDeck';
 import { UserProvider } from './components/UserContext';
 
 function App() {
@@ -14,7 +15,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/main" element={<Main />} />
-          <Route path="/profile" element={<Profile />} /> {/* Ajouter la route pour Profile */}
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/matcher" element={<SwipeDeck />} />
         </Routes>
       </Router>
     </UserProvider>

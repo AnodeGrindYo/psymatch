@@ -9,7 +9,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-500 p-4 text-white">
+    <nav className="bg-blue-500 p-4 text-white fixed w-full top-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-lg font-bold">PsyMatch</Link>
         <button onClick={toggleMenu} className="focus:outline-none">
@@ -17,6 +17,7 @@ const Navbar = () => {
         </button>
       </div>
       <div className={`w-full ${menuOpen ? 'block' : 'hidden'}`}>
+        <Link to="/main" className="block p-4 hover:bg-blue-600">Accueil</Link>
         <Link to="/matcher" className="block p-4 hover:bg-blue-600">Matcher</Link>
         <Link to="/matches" className="block p-4 hover:bg-blue-600">Matchs</Link>
         <Link to="/profile" className="block p-4 hover:bg-blue-600">Profil</Link>
