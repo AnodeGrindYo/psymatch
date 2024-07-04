@@ -7,6 +7,9 @@ const app = express();
 const path = require('path');
 const psychologistRoutes = require('./routes/psychologistRoutes');
 const matchRoutes = require('./routes/matchRoutes');
+const videoRoutes = require('./routes/videoRoutes');
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
 require('dotenv').config();
 
@@ -34,6 +37,7 @@ const upload = multer({ storage: storage });
 app.use('/uploads', express.static('uploads'));
 app.use(psychologistRoutes);
 app.use(matchRoutes);
+app.use(videoRoutes);
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
@@ -43,6 +47,32 @@ app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
+});
+
+// Socket.IO pour la signalisation WebRTC
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('join', (sessionId) => {
+    socket.join(sessionId);
+    console.log(`User joined session: ${sessionId}`);
+  });
+
+  socket.on('offer', ({ offer, sessionId }) => {
+    socket.to(sessionId).emit('offer', offer);
+  });
+
+  socket.on('answer', ({ answer, sessionId }) => {
+    socket.to(sessionId).emit('answer', answer);
+  });
+
+  socket.on('ice-candidate', ({ candidate, sessionId }) => {
+    socket.to(sessionId).emit('ice-candidate', candidate);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
