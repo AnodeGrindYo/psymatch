@@ -1,10 +1,12 @@
 import React from 'react';
 
 const SwipeCard = ({ psychologist, onSwipeLeft, onSwipeRight }) => {
+  const profilePicture = psychologist.profilePicture || '/path/to/default/profile/picture.jpg';
+
   return (
     <div className="flex flex-col items-center justify-center h-full bg-white p-6 rounded-lg shadow-md text-center">
       <img 
-        src={psychologist.profilePicture} 
+        src={profilePicture} 
         alt={`${psychologist.firstName} ${psychologist.lastName}`} 
         className="w-32 h-32 rounded-full mx-auto mb-4" 
       />

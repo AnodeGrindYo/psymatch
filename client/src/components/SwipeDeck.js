@@ -9,9 +9,18 @@ const SwipeDeck = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    // Fetch psychologists from the backend
-    fetch('/api/psychologists')
-      .then(response => response.json())
+    // Fetch psychologists from the backend with authorization header
+    fetch('/api/psychologists', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then(data => setPsychologists(data))
       .catch(error => console.error('Error fetching psychologists:', error));
   }, []);

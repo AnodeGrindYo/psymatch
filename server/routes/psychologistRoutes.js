@@ -1,16 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Psychologist = require('../models/psy');
-const auth = require('../middlewares/auth'); // middleware d'authentification
+const auth = require('../middlewares/auth');
+const psychologistController = require('../controllers/psychologistController');
 
-// Route pour obtenir les psychologues disponibles
-router.get('/api/psychologists', auth, async (req, res) => {
-  try {
-    const psychologists = await Psychologist.find();
-    res.json(psychologists);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des psychologues' });
-  }
-});
+router.get('/api/psychologists', auth, psychologistController.getAllPsychologists);
+router.get('/api/psychologists/nearby', auth, psychologistController.getNearbyPsychologists);
+router.get('/api/psychologists/:psychologistId/slots', auth, psychologistController.getPsychologistSlots);
 
 module.exports = router;
